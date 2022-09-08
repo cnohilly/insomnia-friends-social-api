@@ -30,3 +30,5 @@ router.route('/:userId/:thoughtId')
 // /api/thoughts/<userId>/<thoughtId>/<reactionId>
 router.route('/:userId/:thoughtId/:reactionId')
     .delete(deleteReaction);
+
+module.exports = router;

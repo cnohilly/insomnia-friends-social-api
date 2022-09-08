@@ -31,9 +31,29 @@ const thoughtController = {
     // create new thought
     async createThought({ body }, res) {
         try {
-            // creates a new thought using the body
-            const dbThoughtData = await Thought.create(body);
-            res.json(dbThoughtData);
+            // creates a new thought using the body and gets the id
+            const { _id } = await Thought.create(body);
+
+            const dbUserData = await User.findOneAndUpdate(
+                { _id: params.userId },
+                { $push: { thoughts: _id } },
+                { new: true }
+            ).populate({
+                path: 'thoughts',
+                select: '-__v'
+            }).populate({
+                path: 'friends',
+                select: '-__v'
+            });
+
+            if (!dbUserData) {
+                // if the user did not exist, will find and delete the newly created comment
+                await Thought.findOneAndDelete({ _id });
+                res.status(404).json({ message: 'No User with this ID!' });
+                return;
+            }
+
+            res.json(dbUserData);
         } catch (err) {
             console.log(err);
             res.status(400).json(err);
