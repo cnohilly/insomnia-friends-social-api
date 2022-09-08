@@ -18,7 +18,7 @@ const userController = {
             res.json(dbUserData);
         } catch (err) {
             console.log(err);
-            res.status(400).send(err);
+            res.status(400).json(err);
         }
 
     },
@@ -40,7 +40,7 @@ const userController = {
             res.json(dbUserData);
         } catch (err) {
             console.log(err);
-            res.status(400).send(err);
+            res.status(400).json(err);
         }
     },
 
@@ -51,7 +51,7 @@ const userController = {
             res.json(dbUserData);
         } catch (err) {
             console.log(err);
-            res.status(400).send(err);
+            res.status(400).json(err);
         }
     },
 
@@ -72,12 +72,20 @@ const userController = {
             res.json(dbUserData);
         } catch (err) {
             console.log(err);
-            res.status(400).send(err);
+            res.status(400).json(err);
         }
     },
 
     // delete a user by id
-
+    async deleteUser({ params }, res) {
+        try {
+            const dbUserData = await User.findOneAndDelete({ _id: params.id });
+            res.json(dbUserData);
+        } catch (err) {
+            console.log(err);
+            res.status(400).json(err);
+        }
+    }
 }
 
 module.exports = userController;
