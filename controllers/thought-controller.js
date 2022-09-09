@@ -1,4 +1,4 @@
-const { Thought } = require('../models');
+const { User, Thought } = require('../models');
 
 const thoughtController = {
     // get all thoughts
@@ -19,7 +19,7 @@ const thoughtController = {
     async getThoughtById({ params }, res) {
         try {
             // finds the thought for the specific id
-            const dbThoughtData = await Thought.find({ _id: params.id })
+            const dbThoughtData = await Thought.findOne({ _id: params.thoughtId })
                 .select('-__v')
             res.json(dbThoughtData);
         } catch (err) {
@@ -29,7 +29,7 @@ const thoughtController = {
     },
 
     // create new thought
-    async createThought({ body }, res) {
+    async createThought({ params, body }, res) {
         try {
             // creates a new thought using the body and gets the id
             const { _id } = await Thought.create(body);
@@ -65,7 +65,7 @@ const thoughtController = {
         try {
             // finds and updates the specified thought
             const dbThoughtData = await Thought.findOneAndUpdate(
-                { _id: params.id },
+                { _id: params.thoughtId },
                 body,
                 { new: true, runValidators: true }
             );
@@ -150,7 +150,7 @@ const thoughtController = {
             // attempts to pull the specified reaction from the reactions array
             const dbThoughtData = await Thought.findOneAndUpdate(
                 { _id: params.thoughtId },
-                { $pull: { reactions: params.replyId } },
+                { $pull: { reactions: { _id: params.reactionId } } },
                 { new: true }
             );
 
