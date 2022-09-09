@@ -35,12 +35,15 @@ const UserSchema = new Schema(
     }
 );
 
+// virtuals will return undefined and not be included in the output data 
+//      if the necessary field is excluded
 UserSchema.virtual('thoughtCount').get(function () {
-    return (this.thoughts) ? this.thoughts.length : null;
+    return (this.thoughts) ? this.thoughts.length : undefined;
 });
 
 UserSchema.virtual('friendCount').get(function () {
-    return (this.friends) ? this.friends.length : null;
+
+    return (this.friends) ? this.friends.length : undefined;
 });
 
 const User = model('User', UserSchema);
