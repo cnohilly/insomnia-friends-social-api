@@ -11,7 +11,8 @@ const userController = {
                 })
                 .populate({
                     path: 'friends',
-                    select: '-__v'
+                    select: 'username',
+                    toObject: { virtuals: false }
                 })
                 .select('-__v')
                 .sort({ _id: -1 });
@@ -85,7 +86,62 @@ const userController = {
             console.log(err);
             res.status(400).json(err);
         }
+    },
+
+    // add a friend
+    async addFriend({ params }, res) {
+        try {
+            const dbUserData = await User.findOneAndUpdate(
+                { _id: params.userId },
+                { $push: { friends: params.friendId } },
+                { new: true }
+            ).populate({
+                path: 'thoughts',
+                select: '-__v'
+            }).populate({
+                path: 'friends',
+                select: '-__v'
+            });;
+
+            if (!dbUserData) {
+                res.status(404).json({ message: 'No User with this ID!' });
+                return;
+            }
+
+            res.json(dbUserData);
+        } catch (err) {
+            console.log(err);
+            res.status(400).json(err);
+        }
+    },
+
+    // remove a friend
+    async removeFriend({ params }, res) {
+        try {
+            const dbUserData = await User.findOneAndUpdate(
+                { _id: params.userId },
+                { $pull: { friends: params.friendId } },
+                { new: true }
+            ).populate({
+                path: 'thoughts',
+                select: '-__v'
+            }).populate({
+                path: 'friends',
+                select: '-__v'
+            });
+
+            if (!dbUserData) {
+                res.status(404).json({ message: 'No user with this ID!' });
+                return;
+            }
+
+            res.json(dbUserData);
+        } catch (err) {
+            console.log(err);
+            res.status(400).json(err);
+        }
     }
+
 }
 
 module.exports = userController;
