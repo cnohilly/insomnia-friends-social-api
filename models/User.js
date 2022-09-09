@@ -36,13 +36,12 @@ const UserSchema = new Schema(
 );
 
 // virtuals will return undefined and not be included in the output data 
-//      if the necessary field is excluded
+//      if the necessary field is excluded to avoid errors
 UserSchema.virtual('thoughtCount').get(function () {
     return (this.thoughts) ? this.thoughts.length : undefined;
 });
 
 UserSchema.virtual('friendCount').get(function () {
-
     return (this.friends) ? this.friends.length : undefined;
 });
 

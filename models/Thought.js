@@ -55,6 +55,8 @@ const ThoughtSchema = new Schema(
     }
 );
 
+// virtual will return undefined and be excluded from output data if the
+//      necessary field is not selected to avoid errors
 ThoughtSchema.virtual('reactionCount').get(function () {
     return (this.reactions) ? this.reactions.length : undefined;
 });

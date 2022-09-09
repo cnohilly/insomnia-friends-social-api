@@ -14,7 +14,6 @@ const userController = {
                 .populate({
                     path: 'friends',
                     select: 'username',
-
                 })
                 .select('-__v')
                 .sort({ _id: -1 });
