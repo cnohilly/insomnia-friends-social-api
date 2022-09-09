@@ -6,6 +6,17 @@ const thoughtController = {
         try {
             // finds all the thoughts and sorts 
             const dbThoughtData = await Thought.find({})
+                .populate({
+                    path: 'createdBy',
+                    select: 'username'
+                })
+                .populate({
+                    path: 'reactions',
+                    populate: {
+                        path: 'createdBy',
+                        select: 'username'
+                    }
+                })
                 .select('-__v')
                 .sort({ _id: -1 });
             res.json(dbThoughtData);
@@ -20,6 +31,17 @@ const thoughtController = {
         try {
             // finds the thought for the specific id
             const dbThoughtData = await Thought.findOne({ _id: params.thoughtId })
+                .populate({
+                    path: 'createdBy',
+                    select: 'username'
+                })
+                .populate({
+                    path: 'reactions',
+                    populate: {
+                        path: 'createdBy',
+                        select: 'username'
+                    }
+                })
                 .select('-__v')
             res.json(dbThoughtData);
         } catch (err) {
@@ -31,19 +53,31 @@ const thoughtController = {
     // create new thought
     async createThought({ params, body }, res) {
         try {
-            // creates a new thought using the body and gets the id
-            const { _id } = await Thought.create(body);
+            // creates a new thought using the body and the id of the user from params
+            const { _id } = await Thought.create({ ...body, createdBy: params.userId });
 
             const dbUserData = await User.findOneAndUpdate(
                 { _id: params.userId },
                 { $push: { thoughts: _id } },
                 { new: true }
             ).populate({
+                // populates the thoughts, populates the created by for thoughts, and populates the created by for reactions
                 path: 'thoughts',
-                select: '-__v'
+                select: '-__v',
+                populate: {
+                    path: 'createdBy',
+                    select: 'username'
+                },
+                populate: {
+                    path: 'reactions',
+                    populate: {
+                        path: 'createdBy',
+                        select: 'username'
+                    }
+                }
             }).populate({
                 path: 'friends',
-                select: '-__v'
+                select: 'username'
             });
 
             if (!dbUserData) {
@@ -68,7 +102,16 @@ const thoughtController = {
                 { _id: params.thoughtId },
                 body,
                 { new: true, runValidators: true }
-            );
+            ).populate({
+                path: 'createdBy',
+                select: 'username',
+            }).populate({
+                path: 'reactions',
+                populate: {
+                    path: 'createdBy',
+                    select: 'username'
+                }
+            });
 
             // if the thought did not exist
             if (!dbThoughtData) {
@@ -102,10 +145,21 @@ const thoughtController = {
                 { new: true }
             ).populate({
                 path: 'thoughts',
-                select: '-__v'
+                select: '-__v',
+                populate: {
+                    path: 'createdBy',
+                    select: 'username'
+                },
+                populate: {
+                    path: 'reactions',
+                    populate: {
+                        path: 'createdBy',
+                        select: 'username'
+                    }
+                }
             }).populate({
                 path: 'friends',
-                select: '-__v'
+                select: 'username'
             });
 
             // if the user did not exist
@@ -127,9 +181,19 @@ const thoughtController = {
             // attempts to add a new reaction to the thought 
             const dbThoughtData = await Thought.findOneAndUpdate(
                 { _id: params.thoughtId },
-                { $push: { reactions: body } },
+                // uses the body and userid from params
+                { $push: { reactions: { ...body, createdBy: params.userId } } },
                 { new: true, runValidators: true }
-            );
+            ).populate({
+                path: 'createdBy',
+                select: 'username'
+            }).populate({
+                path: 'reactions',
+                populate: {
+                    path: 'createdBy',
+                    select: 'username'
+                }
+            });
 
             // if the thought did not exist
             if (!dbThoughtData) {
@@ -152,7 +216,16 @@ const thoughtController = {
                 { _id: params.thoughtId },
                 { $pull: { reactions: { _id: params.reactionId } } },
                 { new: true }
-            );
+            ).populate({
+                path: 'createdBy',
+                select: 'username'
+            }).populate({
+                path: 'reactions',
+                populate: {
+                    path: 'createdBy',
+                    select: 'username'
+                }
+            });
 
             res.json(dbThoughtData);
         } catch (err) {

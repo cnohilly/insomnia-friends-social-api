@@ -3,10 +3,12 @@ const dateFormat = require('../utils/dateFormat');
 
 const ReactionSchema = new Schema(
     {
+        // references User model and can not be changed
         createdBy: {
-            type: String,
+            type: Schema.Types.ObjectId,
+            ref: 'User',
             required: true,
-            trim: true
+            immutable: true
         },
         reactionBody: {
             type: String,
@@ -29,10 +31,12 @@ const ReactionSchema = new Schema(
 
 const ThoughtSchema = new Schema(
     {
+        // references User model and can not be changed
         createdBy: {
-            type: String,
+            type: Schema.Types.ObjectId,
+            ref: 'User',
             required: true,
-            trim: true
+            immutable: true
         },
         thoughtBody: {
             type: String,
